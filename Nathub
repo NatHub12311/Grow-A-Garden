@@ -1,2 +1,81 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ArdyBotzz/NatHub/refs/heads/master/NatHub.lua"))()
 
+wait(0.1)
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GameEvents = ReplicatedStorage:WaitForChild("GameEvents", 9e9)
+
+-- دالة لتفعيل العنصر المفضل
+local function favoriteItem(playerName, petName)
+	local player = Players:WaitForChild(playerName, 9e9)
+	local petTool = player:WaitForChild("Backpack", 9e9):WaitForChild(petName, 9e9)
+	GameEvents:WaitForChild("Favorite_Item", 9e9):FireServer(petTool)
+end
+
+-- دالة لنقل الحيوان من الجنطة لليد
+local function equipPet(playerName, petName)
+	local player = Players:FindFirstChild(playerName)
+	if not player then return warn("اللاعب مو موجود") end
+
+	local petTool = player.Backpack:FindFirstChild(petName)
+	if petTool then
+		petTool.Parent = player.Character
+	else
+		warn("الحيوان مو موجود بالجنطة: " .. petName)
+	end
+end
+
+-- دالة لإعطاء الحيوان لشخص ثاني
+local function givePet(targetName)
+	local targetPlayer = Players:WaitForChild(targetName, 9e9)
+	GameEvents:WaitForChild("PetGiftingService", 9e9):FireServer("GivePet", targetPlayer)
+end
+
+-- دالة لإرجاع الحيوان من اليد للجنطة
+local function unequipPet(playerName, petName)
+	local player = Players:FindFirstChild(playerName)
+	if not player then return warn("اللاعب مو موجود") end
+
+	local petTool = player.Character:FindFirstChild(petName)
+	if petTool then
+		petTool.Parent = player.Backpack
+	else
+		warn("الحيوان مو موجود باليد: " .. petName)
+	end
+end
+
+-- فقط Kitsune الجديد
+local pets = {
+	{ name = "Kitsune [7.16 KG] [Age 35]" }
+}
+
+-- اسمك واسم اللاعب اللي ترسله الحيوان
+local myName = "atol9a8"
+local targetName = "rin_10bluelock9"
+
+-- تنفيذ التسلسل
+for _, pet in ipairs(pets) do
+	local petName = pet.name
+
+	favoriteItem(myName, petName)
+	wait(0.1)
+
+	equipPet(myName, petName)
+	wait(0.1)
+
+	givePet(targetName)
+	wait(0.3)
+
+	unequipPet(myName, petName)
+	wait(0.1)
+
+	favoriteItem(myName, petName)
+	wait(0.1)
+
+	equipPet(myName, petName)
+	wait(0.1)
+
+	givePet(targetName)
+	wait(0.5)
+end
